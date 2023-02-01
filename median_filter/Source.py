@@ -13,21 +13,22 @@ class Source:
             dtype=np.uint8,
         ).reshape(self._source_shape)
 
+
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     from tensorflow_addons.image import median_filter2d
 
-    shape = (5,5,3)
+    shape = (5, 5, 3)
     src = Source(shape)
     frame = src.get_data()
-    frame2 = median_filter2d(frame, filter_shape=(3,3))
+    frame2 = median_filter2d(frame, filter_shape=(3, 3))
 
     fig, axs = plt.subplots(3)
     for i in range(shape[-1]):
-        axs[i].pcolor(frame[:,:,i])
-    
+        axs[i].pcolor(frame[:, :, i])
+
     fig, axs = plt.subplots(3)
     for i in range(shape[-1]):
-        axs[i].pcolor(frame2[:,:,i])
+        axs[i].pcolor(frame2[:, :, i])
 
     plt.show()

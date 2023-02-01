@@ -1,60 +1,76 @@
+from multiprocessing import Queue
+import random
+from threading import Thread
 from time import sleep
-from  multiprocessing import Queue, Process, Event
 
-class Producer:
-    def __init__(self, fun, *, args=[]):
-        self.fun = lambda : fun(*args)
+# from queue import Queue
 
-    def run(self, queue: Queue, interval: float, event: Event, steps: int=-1):
-        while steps != 0:
+
+STOP_VALUE = "STOP_VALUE"
+
+
+class Producer(Thread):
+    def __init__(
+        self,
+        queue: Queue,
+        interval: float,
+        steps: int = -1,
+        fun=lambda: random.random() * 3,
+        **kwargs,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.queue = queue
+        self.interval = interval
+        self.steps = steps
+        self.fun = fun
+
+    def run(self):
+        while self.steps != 0:
             data = self.fun()
-            queue.put(data)
-            sleep(interval)
-            steps -= 1
-        event.set()
+            self.queue.put(data)
+            sleep(self.interval)
+            self.steps -= 1
+        self.queue.put(STOP_VALUE)
 
 
-class Consumer:
-    def __init__(self, fun, *, args=[]):
-        self.fun = lambda x: fun(x, *args)
-
-    def run(
+class Consumer(Thread):
+    def __init__(
         self,
         queue_in: Queue,
         queue_out: Queue,
-        event: Event
+        fun=lambda x: 2 * x - 3,
+        **kwargs,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.queue_in = queue_in
+        self.queue_out = queue_out
+        self.fun = fun
+
+    def run(
+        self,
     ):
-        i = 0
-        while not event.is_set() or not queue0.empty():
-            if queue0.empty():
+        while 1:
+            if self.queue_in.empty():
                 continue
-            # print(i, event.is_set(), queue0.empty())
-            # i+=1
-            data = queue_in.get()
-            queue_out.put(self.fun(data))
+            data = self.queue_in.get()
+            if data == STOP_VALUE:
+                break
+            self.queue_out.put(self.fun(data))
 
 
-if __name__ =="__main__":
+if __name__ == "__main__":
     import random
+
     queue0 = Queue()
     queue1 = Queue()
-    prod = Producer(lambda x, y: random.random() * (y-x) + x, args=[0,3])
-    cons = Consumer(lambda x: 2 * x - 3)
-    event = Event()
-    proc = [
-        Process(
-            target=prod.run,
-            args=(queue0, 1/1000, event, 100),
-        ),
-        Process(
-            target=cons.run,
-            args=(queue0, queue1, event),
-        ),
-    ]
+    prod = Producer(queue0, 10 / 1000, 100)
+    cons = Consumer(queue0, queue1)
 
-    for p in proc:
-        p.start()
+    prod.start()
+    cons.start()
 
-    sleep(1)
+    prod.join()
+    cons.join()
+
     while not queue1.empty() or not queue0.empty():
         print(queue1.get())
