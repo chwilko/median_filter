@@ -1,10 +1,6 @@
-import os
-from threading import Lock
-
 import numpy as np
-from skimage import io
 
-from median_filter import Consumer, MedianFilter, Producer, Queue
+from median_filter import MedianFilter, PictureRecorder, Producer, Queue
 
 
 class Source:
@@ -20,47 +16,11 @@ class Source:
         ).reshape(self._source_shape)
 
 
-class Recorder:
-    def __init__(
-        self,
-        folder_name,
-        file_name,
-        file_ext="png",
-    ) -> None:
-        self.folder_name = folder_name
-        self.file_name = file_name
-        self.file_ext = file_ext
-        self._i = 0
-        self.lock = Lock()
-        self.make_folder(self.folder_name)
-
-    def make_folder(self, folder):
-        with self.lock:
-            if folder not in os.listdir():
-                os.mkdir(folder)
-
-    def new_name(self):
-        with self.lock:
-            name = os.sep.join(
-                [self.folder_name, f"{self.file_name}_{self._i}.{self.file_ext}"]
-            )
-            self._i += 1
-        return name
-
-    def save_to_file(self, frame: np.ndarray):
-        name = self.new_name()
-        io.imsave(
-            name,
-            arr=(255 * frame).astype(np.dtype("uint8")),
-        )
-
-
 def main():
     input_shape = (1024, 768, 3)
     new_frame_shape = (512, 384)
     filter_shape = (5, 5, 1)
     interval = 50 / 1000
-    interval /= 10
     steps = 10
     folder_name = "processed"
     file_name = "output"
@@ -69,7 +29,6 @@ def main():
     queue1: Queue = Queue()
 
     src = Source(input_shape)
-    rec = Recorder(folder_name, file_name, "png")
 
     producer = Producer(queue0, src.get_data, interval, steps)
     broker = MedianFilter(
@@ -78,7 +37,7 @@ def main():
         new_frame_shape=new_frame_shape,
         filter_shape=filter_shape,
     )
-    consumer = Consumer(queue1, lambda frame: rec.save_to_file(frame))
+    consumer = PictureRecorder(queue1, folder_name, file_name, file_ext="png")
 
     producer.start()
     broker.start()
