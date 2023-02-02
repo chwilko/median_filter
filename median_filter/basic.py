@@ -1,21 +1,17 @@
 from multiprocessing import Queue
-import random
 from threading import Thread
 from time import sleep
 
-# from queue import Queue
-
-
-STOP_VALUE = "STOP_VALUE"
+from .common import StopValue
 
 
 class Producer(Thread):
     def __init__(
         self,
         queue: Queue,
-        interval: float,
+        fun,
+        interval: float = 0,
         steps: int = -1,
-        fun=lambda: random.random() * 3,
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
@@ -30,15 +26,15 @@ class Producer(Thread):
             self.queue.put(data)
             sleep(self.interval)
             self.steps -= 1
-        self.queue.put(STOP_VALUE)
+        self.queue.put(StopValue())
 
 
-class Consumer(Thread):
+class Broker(Thread):
     def __init__(
         self,
         queue_in: Queue,
         queue_out: Queue,
-        fun=lambda x: 2 * x - 3,
+        fun,
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
@@ -53,24 +49,32 @@ class Consumer(Thread):
             if self.queue_in.empty():
                 continue
             data = self.queue_in.get()
-            if data == STOP_VALUE:
+            # if type(data) is StopValue:
+            if isinstance(data, StopValue):
+                self.queue_in.put(StopValue())
+                self.queue_out.put(StopValue())
                 break
             self.queue_out.put(self.fun(data))
 
 
-if __name__ == "__main__":
-    import random
+class Consumer(Thread):
+    def __init__(
+        self,
+        queue: Queue,
+        fun,
+        **kwargs,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.queue = queue
+        self.fun = fun
 
-    queue0 = Queue()
-    queue1 = Queue()
-    prod = Producer(queue0, 10 / 1000, 100)
-    cons = Consumer(queue0, queue1)
-
-    prod.start()
-    cons.start()
-
-    prod.join()
-    cons.join()
-
-    while not queue1.empty() or not queue0.empty():
-        print(queue1.get())
+    def run(self):
+        while 1:
+            if self.queue.empty():
+                continue
+            data = self.queue.get()
+            # if type(data) is StopValue:
+            if isinstance(data, StopValue):
+                self.queue.put(StopValue())
+                break
+            self.fun(data)

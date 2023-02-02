@@ -2,4 +2,7 @@ YOU:
 	echo "make"
 
 lint:
-	bash lint.sh
+	bash lint.sh .
+
+clean:
+	rm processed/*
