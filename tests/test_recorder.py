@@ -27,15 +27,8 @@ def test_preparing_file():
     assert os.path.exists(folder_name)
 
 
-@pytest.mark.parametrize(
-    "dim",
-    (
-        1,
-        3,
-        4,
-    ),
-)
-def test_use_next_names(dim):
+@pytest.mark.parametrize("dim", (1, 3, 4))
+def test_use_next_names(dim: int):
     folder_name = os.sep.join(["tests", "try"])
     file_name = "test"
     if os.path.exists(folder_name):
@@ -53,15 +46,8 @@ def test_use_next_names(dim):
         assert f"{file_name}_{i}.png" in os.listdir(folder_name)
 
 
-@pytest.mark.parametrize(
-    "dim",
-    (
-        1,
-        3,
-        4,
-    ),
-)
-def test_save_pictures(dim):
+@pytest.mark.parametrize("dim", (1, 3, 4))
+def test_save_pictures(dim: int):
     folder_name = os.sep.join(["tests", "try"])
     file_name = "test"
     if os.path.exists(folder_name):

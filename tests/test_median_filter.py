@@ -61,7 +61,9 @@ def test_resize_median_filter_shape():
 
 
 @pytest.mark.parametrize("median_shape, pic_shape", median_check_params)
-def test_resize_median_filter_median(median_shape, pic_shape):
+def test_resize_median_filter_median(
+    median_shape: Tuple[int, int], pic_shape: Tuple[int, int]
+):
     pics = [np.random.random((*pic_shape, 3)) for _ in range(3)]
     for pic in pics:
         new_pic = _resize_median_filter(

@@ -39,7 +39,6 @@ def main():
     )
     consumer = PictureRecorder(queue1, folder_name, file_name, file_ext="png")
 
-
     producer.start()
     consumer.start()
     broker.start()
