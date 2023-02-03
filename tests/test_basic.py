@@ -2,7 +2,7 @@ import random
 
 import pytest
 
-from median_filter import Queue, StopValue
+from median_filter import Queue, StopValue, set_n_steps
 from median_filter.basic import Broker, Consumer, Producer
 
 
@@ -16,18 +16,18 @@ from median_filter.basic import Broker, Consumer, Producer
 )
 def test_porducer(n):
     queue: Queue = Queue()
-    fun = lambda: 1
+    counter = set_n_steps(n)
+    fun = lambda: (next(counter), 1)
     prod = Producer(
         queue,
         fun,
         interval=0,
-        n_steps=n,
     )
     prod.start()
 
     prod.join()
     for _ in range(n):
-        assert queue.get() == fun()
+        assert queue.get() == fun()[1]
 
     last = queue.get()
     assert isinstance(last, StopValue)

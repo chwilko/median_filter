@@ -32,7 +32,6 @@ class Producer(Thread):
         queue: Queue,
         fun,
         interval: float = 0,
-        n_steps: int = -1,
         *,
         name: str = None,
         daemon: bool = None,
@@ -40,10 +39,10 @@ class Producer(Thread):
         """Initialize self.
 
         Args:
-            queue (multiprocessing.Queue): queue for converted data. Will be ended by StopValue
+            queue (multiprocessing.Queue): queue for converted data.
+                Will be ended by median_filter.StopValue.
             fun: function to produce data
             interval (float, optional): interval to next function calling. Defaults to 0.
-            #! n_steps (int, optional): nubmer of function calling, after thread finish.
                 If n_steps < 0 thread have infinity loop. Defaults to -1.
             name (str, optional): the thread name. By default, a unique name is constructed of
                 the form "Thread-N" where N is a small decimal number.
@@ -52,20 +51,20 @@ class Producer(Thread):
         super().__init__(name=name, daemon=daemon)
         self.queue = queue
         self.interval = interval
-        self.n_steps = int(n_steps)
         self.fun = fun
 
     def run(self):
         """Method representing the thread's activity."""
-        while self.n_steps != 0:
-            data = self.fun()
+        while 1:
+            processing, data = self.fun()
+            if not processing:
+                break
             self.queue.put(data)
             sleep(self.interval)
-            self.n_steps -= 1
         self.queue.put(StopValue())
 
 
-class Broker(Thread):  # TODO napisać, że kolejka ma się konczyć instancją StopValue
+class Broker(Thread):
     """
     Takes data from one queue, converts it,
         and puts it into another as distinct thread.
@@ -100,8 +99,9 @@ class Broker(Thread):  # TODO napisać, że kolejka ma się konczyć instancją 
         """Initialize self.
 
         Args:
-            queue_in (multiprocessing.Queue): queue with data to convert ended by StopValue
-            queue_out (multiprocessing.Queue): queue for converted data. Will be ended by StopValue
+            queue_in (multiprocessing.Queue): queue with data to convert.
+                Must be ended by median_filter.StopValue.
+            queue_out (multiprocessing.Queue): queue for converted data.
             fun: function for data processing
             name (str, optional): the thread name. By default, a unique name is constructed of
                 the form "Thread-N" where N is a small decimal number.
@@ -160,7 +160,8 @@ class Consumer(Thread):
         """Initialize self.
 
         Args:
-            queue (multiprocessing.Queue): queue with data to convert ended by StopValue.
+            queue (multiprocessing.Queue): queue with data to convert.
+                Must be ended by median_filter.StopValue.
             fun: function to consume data from queue.
             name (str, optional): the thread name. By default, a unique name is constructed of
                 the form "Thread-N" where N is a small decimal number.

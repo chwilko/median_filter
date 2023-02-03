@@ -6,3 +6,10 @@ class StopValue:
 
     def __init__(self) -> None:
         pass
+
+
+def set_n_steps(n):
+    i = 0
+    while 1:
+        yield i < n
+        i += 1

@@ -1,6 +1,7 @@
 import numpy as np
 
-from median_filter import MedianFilter, PictureRecorder, Producer, Queue
+from median_filter import (MedianFilter, PictureRecorder, Producer, Queue,
+                           set_n_steps)
 
 
 class Source:
@@ -22,6 +23,7 @@ def main():
     filter_shape = (5, 5, 1)
     interval = 50 / 1000
     n_steps = 100
+    counter = set_n_steps(n_steps)
     folder_name = "processed"
     file_name = "output"
 
@@ -30,7 +32,7 @@ def main():
 
     src = Source(input_shape)
 
-    producer = Producer(queue0, src.get_data, interval, n_steps)
+    producer = Producer(queue0, lambda: (next(counter), src.get_data()), interval)
     broker = MedianFilter(
         queue_in=queue0,
         queue_out=queue1,
