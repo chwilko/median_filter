@@ -21,7 +21,7 @@ def main():
     new_frame_shape = (512, 384)
     filter_shape = (5, 5, 1)
     interval = 50 / 1000
-    steps = 10
+    steps = 100
     folder_name = "processed"
     file_name = "output"
 
@@ -39,9 +39,10 @@ def main():
     )
     consumer = PictureRecorder(queue1, folder_name, file_name, file_ext="png")
 
+
     producer.start()
-    broker.start()
     consumer.start()
+    broker.start()
 
     producer.join()
     broker.join()

@@ -2,7 +2,7 @@ import os
 from threading import Lock
 
 import numpy as np
-from skimage import io
+from skimage.io import imsave
 
 from .basic import Consumer, Queue
 
@@ -33,7 +33,7 @@ class _Recorder:
     def make_folder(self) -> None:
         """method prepare folder to save pictures."""
         with self.lock:
-            if self.folder_name not in os.listdir():
+            if not os.path.exists(self.folder_name):
                 os.mkdir(self.folder_name)
 
     def _new_name(self) -> str:
@@ -57,7 +57,7 @@ class _Recorder:
             frame (np.ndarray): frame representing the picture
         """
         name = self._new_name()
-        io.imsave(
+        imsave(
             name,
             arr=(255 * frame).astype(np.dtype("uint8")),
         )
