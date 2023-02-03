@@ -61,7 +61,8 @@ class MedianFilter(Broker):
         name: str = None,
         daemon: bool = False,
     ) -> None:
-        """
+        """Initialize self.
+
         Args:
             queue_in (multiprocessing.Queue): queue with data to convert ended by StopValue
             queue_out (multiprocessing.Queue): queue for converted data. Will be ended by StopValue

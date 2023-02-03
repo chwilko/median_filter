@@ -16,7 +16,7 @@ class _Recorder:
         file_name: str,
         file_ext: str = "png",
     ) -> None:
-        """Class to record pictures
+        """Initialize self.
 
         Args:
             folder_name (str): folder to save pictures

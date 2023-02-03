@@ -37,8 +37,7 @@ class Producer(Thread):
         name: str = None,
         daemon: bool = False,
     ) -> None:
-        """_summary_
-
+        """
         Args:
             queue (multiprocessing.Queue): queue for converted data. Will be ended by StopValue
             fun (_type_): _description_
@@ -64,7 +63,7 @@ class Producer(Thread):
         self.queue.put(StopValue())
 
 
-class Broker(Thread):
+class Broker(Thread):  # TODO napisać, że kolejka ma się konczyć instancją StopValue
     """
     Takes data from one queue, converts it,
         and puts it into another as distinct thread.
@@ -96,7 +95,7 @@ class Broker(Thread):
         name: str = None,
         daemon: bool = False,
     ) -> None:
-        """_summary_
+        """Initialize self.
 
         Args:
             queue_in (multiprocessing.Queue): queue with data to convert ended by StopValue
@@ -156,7 +155,7 @@ class Consumer(Thread):
         name: str = None,
         daemon: bool = False,
     ) -> None:
-        """_summary_
+        """Initialize self.
 
         Args:
             queue (multiprocessing.Queue): queue with data to convert ended by StopValue.
