@@ -15,12 +15,13 @@ median_check_params = (
 
 
 def median(values: np.ndarray):
-    values = sorted(values.flatten())
-    n = len(values)
+    values_list = sorted(values.flatten())
+    n = len(values_list)
     if n % 2:
-        return values[len(values) // 2]
-    else:
-        return (values[len(values) // 2 - 1] + values[len(values) // 2]) / 2
+        return values_list[len(values_list) // 2]
+    return (
+        values_list[len(values_list) // 2 - 1] + values_list[len(values_list) // 2]
+    ) / 2
 
 
 def random_median_check(
@@ -61,7 +62,6 @@ def test_resize_median_filter_shape():
 
 @pytest.mark.parametrize("median_shape, pic_shape", median_check_params)
 def test_resize_median_filter_median(median_shape, pic_shape):
-    pic_shape = (128, 512)
     pics = [np.random.random((*pic_shape, 3)) for _ in range(3)]
     for pic in pics:
         new_pic = _resize_median_filter(
@@ -74,10 +74,9 @@ def test_resize_median_filter_median(median_shape, pic_shape):
 
 
 @pytest.mark.parametrize("median_shape, pic_shape", median_check_params)
-def test_MedianFilter(median_shape, pic_shape):
-    pic_shape = (128, 256)
-    queue_in = Queue()
-    queue_out = Queue()
+def test_MedianFilter(median_shape: Tuple[int, int], pic_shape: Tuple[int, int]):
+    queue_in: Queue = Queue()
+    queue_out: Queue = Queue()
 
     pics = [np.random.random((*pic_shape, 3)) for _ in range(3)]
 

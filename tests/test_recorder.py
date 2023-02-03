@@ -14,13 +14,13 @@ def test_preparing_file():
     file_name = "test"
     if os.path.exists(folder_name):
         rmtree(folder_name)
-    rec = _Recorder(
+    _Recorder(
         folder_name,
         file_name,
     )
     assert os.path.exists(folder_name)
 
-    rec = _Recorder(
+    _Recorder(
         folder_name,
         file_name,
     )
@@ -83,13 +83,13 @@ def test_save_pictures(dim):
         assert (saved_pic == expected_pic).all()
 
 
-def test_save_pictures():
+def test_save_pictures_thread():
     folder_name = os.sep.join(["tests", "try"])
     file_name = "test"
     if os.path.exists(folder_name):
         rmtree(folder_name)
 
-    queue = Queue()
+    queue: Queue = Queue()
     pics = [np.random.random((10, 10, 3)) for _ in range(5)]
 
     for pic in pics:
@@ -116,7 +116,7 @@ def test_save_pictures_two_recorders():
     if os.path.exists(folder_name):
         rmtree(folder_name)
 
-    queue = Queue()
+    queue: Queue = Queue()
     pics = [np.random.random((10, 10, 3)) for _ in range(100)]
 
     for pic in pics:
