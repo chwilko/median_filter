@@ -94,7 +94,7 @@ class PictureRecorder(Consumer):
         *,
         previous_recorder=None,
         name=None,
-        daemon=False,
+        daemon=None,
     ) -> None:
         """
         Args:

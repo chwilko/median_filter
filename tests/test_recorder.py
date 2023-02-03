@@ -95,7 +95,6 @@ def test_save_pictures():
     for pic in pics:
         queue.put(pic)
     queue.put(StopValue())
-
     recorder = PictureRecorder(
         queue,
         folder_name,
@@ -123,7 +122,6 @@ def test_save_pictures_two_recorders():
     for pic in pics:
         queue.put(pic)
     queue.put(StopValue())
-
     recorder = PictureRecorder(
         queue,
         folder_name,

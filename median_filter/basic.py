@@ -35,7 +35,7 @@ class Producer(Thread):
         steps: int = -1,
         *,
         name: str = None,
-        daemon: bool = False,
+        daemon: bool = None,
     ) -> None:
         """
         Args:
@@ -93,7 +93,7 @@ class Broker(Thread):  # TODO napisać, że kolejka ma się konczyć instancją 
         fun,
         *,
         name: str = None,
-        daemon: bool = False,
+        daemon: bool = None,
     ) -> None:
         """Initialize self.
 
@@ -153,7 +153,7 @@ class Consumer(Thread):
         fun,
         *,
         name: str = None,
-        daemon: bool = False,
+        daemon: bool = None,
     ) -> None:
         """Initialize self.
 

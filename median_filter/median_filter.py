@@ -59,7 +59,7 @@ class MedianFilter(Broker):
         filter_shape: Tuple[int, int, int],
         *,
         name: str = None,
-        daemon: bool = False,
+        daemon: bool = None,
     ) -> None:
         """Initialize self.
 
