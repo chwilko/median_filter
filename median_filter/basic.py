@@ -13,7 +13,7 @@ class Producer(Thread):
         queue0: Queue = Queue()
         queue1: Queue = Queue()
 
-        producer = Producer(queue0, producer_foo, interval, steps)
+        producer = Producer(queue0, producer_foo, interval, n_steps)
         broker = Broker(queue0, queue1, broker_foo)
         consumer = Consumer(queue1, consumer_foo)
 
@@ -32,34 +32,36 @@ class Producer(Thread):
         queue: Queue,
         fun,
         interval: float = 0,
-        steps: int = -1,
+        n_steps: int = -1,
         *,
         name: str = None,
         daemon: bool = None,
     ) -> None:
-        """
+        """Initialize self.
+
         Args:
             queue (multiprocessing.Queue): queue for converted data. Will be ended by StopValue
-            fun (_type_): _description_
-            interval (float, optional): _description_. Defaults to 0.
-            steps (int, optional): _description_. Defaults to -1.
-            name (_type_, optional): the thread name. By default, a unique name is constructed of
+            fun: function to produce data
+            interval (float, optional): interval to next function calling. Defaults to 0.
+            #! n_steps (int, optional): nubmer of function calling, after thread finish.
+                If n_steps < 0 thread have infinity loop. Defaults to -1.
+            name (str, optional): the thread name. By default, a unique name is constructed of
                 the form "Thread-N" where N is a small decimal number.
-            daemon (bool, optional): description below. Defaults to False.
+            daemon (bool, optional): description below. Defaults to None.
         """
         super().__init__(name=name, daemon=daemon)
         self.queue = queue
         self.interval = interval
-        self.steps = steps
+        self.n_steps = int(n_steps)
         self.fun = fun
 
     def run(self):
         """Method representing the thread's activity."""
-        while self.steps != 0:
+        while self.n_steps != 0:
             data = self.fun()
             self.queue.put(data)
             sleep(self.interval)
-            self.steps -= 1
+            self.n_steps -= 1
         self.queue.put(StopValue())
 
 
@@ -72,7 +74,7 @@ class Broker(Thread):  # TODO napisać, że kolejka ma się konczyć instancją 
         queue0: Queue = Queue()
         queue1: Queue = Queue()
 
-        producer = Producer(queue0, producer_foo, interval, steps)
+        producer = Producer(queue0, producer_foo, interval, n_steps)
         broker = Broker(queue0, queue1, broker_foo)
         consumer = Consumer(queue1, consumer_foo)
 
@@ -100,10 +102,10 @@ class Broker(Thread):  # TODO napisać, że kolejka ma się konczyć instancją 
         Args:
             queue_in (multiprocessing.Queue): queue with data to convert ended by StopValue
             queue_out (multiprocessing.Queue): queue for converted data. Will be ended by StopValue
-            fun (_type_): _description_
-            name (_type_, optional): the thread name. By default, a unique name is constructed of
+            fun: function for data processing
+            name (str, optional): the thread name. By default, a unique name is constructed of
                 the form "Thread-N" where N is a small decimal number.
-            daemon (bool, optional): description below. Defaults to False.
+            daemon (bool, optional): description below. Defaults to None.
         """
         super().__init__(name=name, daemon=daemon)
         self.queue_in = queue_in
@@ -133,7 +135,7 @@ class Consumer(Thread):
         queue0: Queue = Queue()
         queue1: Queue = Queue()
 
-        producer = Producer(queue0, producer_foo, interval, steps)
+        producer = Producer(queue0, producer_foo, interval, n_steps)
         broker = Broker(queue0, queue1, broker_foo)
         consumer = Consumer(queue1, consumer_foo)
 
@@ -159,10 +161,10 @@ class Consumer(Thread):
 
         Args:
             queue (multiprocessing.Queue): queue with data to convert ended by StopValue.
-            fun (_type_): _description_
-            name (_type_, optional): the thread name. By default, a unique name is constructed of
+            fun: function to consume data from queue.
+            name (str, optional): the thread name. By default, a unique name is constructed of
                 the form "Thread-N" where N is a small decimal number.
-            daemon (bool, optional): description below. Defaults to False.
+            daemon (bool, optional): description below. Defaults to None.
         """
         super().__init__(name=name, daemon=daemon)
         self.queue = queue

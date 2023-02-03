@@ -68,7 +68,7 @@ class MedianFilter(Broker):
             queue_out (multiprocessing.Queue): queue for converted data. Will be ended by StopValue
             new_frame_shape (Tuple[int, int]): final shape to reshape data from queue_in
             filter_shape (Tuple[int, int, int]): shape of the filter to be used by median filter
-            name (_type_, optional): the thread name. By default, a unique name is constructed of
+            name (str, optional): the thread name. By default, a unique name is constructed of
                 the form "Thread-N" where N is a small decimal number.
             daemon (bool, optional): description below. Defaults to False.
 

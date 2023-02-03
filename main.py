@@ -21,7 +21,7 @@ def main():
     new_frame_shape = (512, 384)
     filter_shape = (5, 5, 1)
     interval = 50 / 1000
-    steps = 100
+    n_steps = 100
     folder_name = "processed"
     file_name = "output"
 
@@ -30,7 +30,7 @@ def main():
 
     src = Source(input_shape)
 
-    producer = Producer(queue0, src.get_data, interval, steps)
+    producer = Producer(queue0, src.get_data, interval, n_steps)
     broker = MedianFilter(
         queue_in=queue0,
         queue_out=queue1,

@@ -21,7 +21,7 @@ def test_porducer(n):
         queue,
         fun,
         interval=0,
-        steps=n,
+        n_steps=n,
     )
     prod.start()
 
