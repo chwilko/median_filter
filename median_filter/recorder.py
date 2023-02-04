@@ -21,7 +21,7 @@ class _Recorder:
         Args:
             folder_name (str): folder to save pictures
             file_name (str): name pattern to save pictures.
-            file_ext (str, optional): Extention for file to record. Defaults to "png".
+            file_ext (str, optional): Extension for file to record. Defaults to "png".
         """
         self.folder_name = folder_name
         self.file_name = file_name
@@ -38,7 +38,6 @@ class _Recorder:
 
     def _new_name(self) -> str:
         """method get new unique name to save file.
-        This method can be used on threds.
 
         Returns:
             str: unique name
@@ -65,8 +64,8 @@ class _Recorder:
 
 class PictureRecorder(Consumer):
     """
-    Takes picture data from queue and save them as picture in seted folder.
-    param previous_recorder = consumer0 let save pictures on some threads and save order
+    Takes picture data from queue and save them as picture in set folder.
+    Parameter previous_recorder = consumer0 let save pictures on some threads and save order
     example use:
 
         folder_name = "folder_name"
@@ -101,7 +100,7 @@ class PictureRecorder(Consumer):
             queue (Queue): queue with picture data ended by StopValue
             folder_name (str): folder to save pictures
             file_name (str): name pattern to save pictures.
-            file_ext (str, optional): Extention for file to record. Defaults to "png".
+            file_ext (str, optional): Extension for file to record. Defaults to "png".
             previous_recorder (PictureRecorder, optional): Prievious PictureRecorder.
                 this case let save pictures on some threads and save order. Defaults to None.
             daemon (bool, optional): description below. Defaults to False.

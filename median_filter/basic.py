@@ -1,19 +1,21 @@
 from multiprocessing import Queue
 from threading import Thread
 from time import sleep
+from typing import Any, Callable, Tuple
 
 from .common import StopValue
 
 
 class Producer(Thread):
     """
-    Takes data and puts it into queue as distinct thread.
+    Takes data and puts it into queue as a distinct thread.
 
-    example use:
+    Example use:
+        counter = set_n_steps(n_steps)
         queue0: Queue = Queue()
         queue1: Queue = Queue()
 
-        producer = Producer(queue0, producer_foo, interval, n_steps)
+        producer = Producer(queue0, lambda: (next(counter), producer_foo), interval)
         broker = Broker(queue0, queue1, broker_foo)
         consumer = Consumer(queue1, consumer_foo)
 
@@ -30,7 +32,7 @@ class Producer(Thread):
     def __init__(
         self,
         queue: Queue,
-        fun,
+        fun: Callable[[], Tuple[bool, Any]],
         interval: float = 0,
         *,
         name: str = None,
@@ -41,7 +43,7 @@ class Producer(Thread):
         Args:
             queue (multiprocessing.Queue): queue for converted data.
                 Will be ended by median_filter.StopValue.
-            fun: function to produce data
+            fun (Callable[[], Tuple[bool, Any]]): function to produce data.
             interval (float, optional): interval to next function calling. Defaults to 0.
                 If n_steps < 0 thread have infinity loop. Defaults to -1.
             name (str, optional): the thread name. By default, a unique name is constructed of
@@ -69,11 +71,11 @@ class Broker(Thread):
     Takes data from one queue, converts it,
         and puts it into another as distinct thread.
 
-    example use:
+    Example use:
         queue0: Queue = Queue()
         queue1: Queue = Queue()
 
-        producer = Producer(queue0, producer_foo, interval, n_steps)
+        producer = Producer(queue0, producer_foo, interval)
         broker = Broker(queue0, queue1, broker_foo)
         consumer = Consumer(queue1, consumer_foo)
 
@@ -91,7 +93,7 @@ class Broker(Thread):
         self,
         queue_in: Queue,
         queue_out: Queue,
-        fun,
+        fun: Callable[[Any], Any],
         *,
         name: str = None,
         daemon: bool = None,
@@ -102,7 +104,7 @@ class Broker(Thread):
             queue_in (multiprocessing.Queue): queue with data to convert.
                 Must be ended by median_filter.StopValue.
             queue_out (multiprocessing.Queue): queue for converted data.
-            fun: function for data processing
+            fun (Callable[[Any], Any]): function for data processing
             name (str, optional): the thread name. By default, a unique name is constructed of
                 the form "Thread-N" where N is a small decimal number.
             daemon (bool, optional): description below. Defaults to None.
@@ -131,11 +133,11 @@ class Consumer(Thread):
     """
     Takes data from queue and use them as distinct thread.
 
-    example use:
+    Example use:
         queue0: Queue = Queue()
         queue1: Queue = Queue()
 
-        producer = Producer(queue0, producer_foo, interval, n_steps)
+        producer = Producer(queue0, producer_foo, interval)
         broker = Broker(queue0, queue1, broker_foo)
         consumer = Consumer(queue1, consumer_foo)
 
@@ -152,7 +154,7 @@ class Consumer(Thread):
     def __init__(
         self,
         queue: Queue,
-        fun,
+        fun: Callable[[Any], Any],
         *,
         name: str = None,
         daemon: bool = None,
@@ -162,7 +164,7 @@ class Consumer(Thread):
         Args:
             queue (multiprocessing.Queue): queue with data to convert.
                 Must be ended by median_filter.StopValue.
-            fun: function to consume data from queue.
+            fun (Callable[[Any], Any]): function to consume data from queue.
             name (str, optional): the thread name. By default, a unique name is constructed of
                 the form "Thread-N" where N is a small decimal number.
             daemon (bool, optional): description below. Defaults to None.

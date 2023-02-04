@@ -47,8 +47,8 @@ def test_porducer(n):
 def test_broker(fun, values):
     queue_in: Queue = Queue()
     queue_out: Queue = Queue()
-    for el in values:
-        queue_in.put(el)
+    for val in values:
+        queue_in.put(val)
     queue_in.put(StopValue())
     broker = Broker(
         queue_in=queue_in,
@@ -59,9 +59,9 @@ def test_broker(fun, values):
 
     broker.join()
 
-    for el_in in values:
-        el_out = queue_out.get()
-        assert el_out == fun(el_in)
+    for val_in in values:
+        val_out = queue_out.get()
+        assert val_out == fun(val_in)
 
     last = queue_out.get()
     assert isinstance(last, StopValue)
@@ -86,8 +86,8 @@ def test_consumer(fun, values):
     rets = []
     fun1 = lambda x: rets.append(fun(x))
     queue: Queue = Queue()
-    for el in values:
-        queue.put(el)
+    for val in values:
+        queue.put(val)
     queue.put(StopValue())
     consumer = Consumer(
         queue=queue,
@@ -98,8 +98,8 @@ def test_consumer(fun, values):
 
     consumer.join()
 
-    for i, el_in in enumerate(values):
-        assert rets[i] == fun(el_in)
+    for i, val_in in enumerate(values):
+        assert rets[i] == fun(val_in)
 
     last = queue.get()
     assert isinstance(last, StopValue)

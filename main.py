@@ -1,7 +1,6 @@
 import numpy as np
 
-from median_filter import (MedianFilter, PictureRecorder, Producer, Queue,
-                           set_n_steps)
+from median_filter import MedianFilter, PictureRecorder, Producer, Queue, set_n_steps
 
 
 class Source:
