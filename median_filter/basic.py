@@ -10,7 +10,7 @@ class Producer(Thread):
     """
     Takes data and puts it into queue as a distinct thread.
 
-    Example use:
+    Usage example:
         counter = set_n_steps(n_steps)
         queue0: Queue = Queue()
         queue1: Queue = Queue()
@@ -44,8 +44,8 @@ class Producer(Thread):
             queue (multiprocessing.Queue): queue for converted data.
                 Will be ended by median_filter.StopValue.
             fun (Callable[[], Tuple[bool, Any]]): function to produce data.
+                Data are producing while fun return (True, ...).
             interval (float, optional): interval to next function calling. Defaults to 0.
-                If n_steps < 0 thread have infinity loop. Defaults to -1.
             name (str, optional): the thread name. By default, a unique name is constructed of
                 the form "Thread-N" where N is a small decimal number.
             daemon (bool, optional): description below. Defaults to None.
@@ -71,7 +71,7 @@ class Broker(Thread):
     Takes data from one queue, converts it,
         and puts it into another as distinct thread.
 
-    Example use:
+    Usage example:
         queue0: Queue = Queue()
         queue1: Queue = Queue()
 
@@ -133,7 +133,7 @@ class Consumer(Thread):
     """
     Takes data from queue and use them as distinct thread.
 
-    Example use:
+    Usage example:
         queue0: Queue = Queue()
         queue1: Queue = Queue()
 
@@ -148,7 +148,6 @@ class Consumer(Thread):
         producer.join()
         broker.join()
         consumer.join()
-
     """
 
     def __init__(

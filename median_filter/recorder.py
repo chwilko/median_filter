@@ -80,8 +80,6 @@ class PictureRecorder(Consumer):
         consumer1.start()
         consumer0.join()
         consumer1.join()
-
-
     """
 
     def __init__(

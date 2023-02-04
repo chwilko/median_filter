@@ -19,20 +19,20 @@ Bartłomiej Chwiłkowski (chwilko)
 
 
 ## General info
-Package implement Producer - Consumer design pattern with a small extension.
+Package implements Producer - Consumer design pattern with a small extension.
 This extension is Broker.
 
-Producer produce data for the queue;
-Consumer consume data from the queue;
+Producer produces data for the queue;
+Consumer consumes data from the queue;
 Broker uses data from the first queue to add to the second queue.
 
-Moreover, are implemented special Broker - MedianFilter and special Consumer - Recorder.
+Moreover, package implements a special case of Broker (MedianFilter) nad a special case of Consumer (Recorder).
 
 ### MedianFilter
-MedianFilter takes array resize them and applies it median filter.
+MedianFilter takes an array, resize it and applies median filter.
 
 ### Recorder
-Recorder save arrays as pictures.
+Recorder saves arrays as a pictures.
 
 
 ## Installation
@@ -57,7 +57,7 @@ python3 main.py
 ```
 
 ## How to use
-example using
+example of usage
 ```
 counter = set_n_steps(n_steps)
 queue0: Queue = Queue()

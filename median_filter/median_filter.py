@@ -31,7 +31,8 @@ def _resize_median_filter(
 
 class MedianFilter(Broker):
     """
-    Takes data from one queue, converts it, and puts it into another as a distinct thread.
+    Takes picture frame (dimmension (m x n x k) where k is 1,3,4) from one queue,
+        converts it, and puts it into another as a distinct thread.
     Example use:
 
     new_frame_shape = (512, 384)
@@ -64,7 +65,8 @@ class MedianFilter(Broker):
         """Initialize self.
 
         Args:
-            queue_in (multiprocessing.Queue): queue with data to convert, ended by StopValue
+            queue_in (multiprocessing.Queue): queue with array to convert, ended by StopValue.
+                Array have to has dimension (m x n x k), where k can be 1,3,4.
             queue_out (multiprocessing.Queue): queue for converted data. Will be ended by StopValue
             new_frame_shape (Tuple[int, int]): final shape to reshape data from queue_in
             filter_shape (Tuple[int, int, int]): shape of the filter to be used by median filter
