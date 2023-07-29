@@ -7,6 +7,7 @@ from threading import Thread
 from typing import Any, Callable
 
 from .common import StopValue
+from .logger import log
 
 
 class Consumer(Thread):
@@ -30,6 +31,8 @@ class Consumer(Thread):
         consumer.join()
     """
 
+    COUNTER = 0
+
     def __init__(
         self,
         queue: Queue,
@@ -37,6 +40,7 @@ class Consumer(Thread):
         *,
         name: str = None,
         daemon: bool = None,
+        verbose: bool = True,
     ) -> None:
         """Initialize self.
 
@@ -47,10 +51,17 @@ class Consumer(Thread):
             name (str, optional): the thread name. By default, a unique name is constructed of
                 the form "Thread-N" where N is a small decimal number.
             daemon (bool, optional): description below. Defaults to None.
+            verbose (bool, optional): If True thread loged. Defaults to True.
         """
+        if name is None:
+            name = f"Consumer-{Consumer.COUNTER}"
+        Consumer.COUNTER += 1
+
         super().__init__(name=name, daemon=daemon)
         self.queue = queue
         self.fun = fun
+        self.verbose = verbose
+        self.log("created")
 
     def run(self):
         """Method representing the thread's activity."""
@@ -62,3 +73,12 @@ class Consumer(Thread):
                 self.queue.put(StopValue())
                 break
             self.fun(data)
+
+            self.log("Consumed.")
+
+    def __del__(self):
+        self.log("closed")
+
+    def log(self, message: str) -> None:
+        if self.verbose:
+            log(message)

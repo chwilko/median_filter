@@ -56,6 +56,8 @@ class MedianFilter(Broker):
     broker.join()
     """
 
+    COUNTER = 0
+
     def __init__(
         self,
         queue_in: Queue,
@@ -65,6 +67,7 @@ class MedianFilter(Broker):
         *,
         name: str = None,
         daemon: bool = None,
+        verbose: bool = True,
     ) -> None:
         """Initialize self.
 
@@ -77,8 +80,11 @@ class MedianFilter(Broker):
             name (str, optional): the thread name. By default, a unique name is constructed of
                 the form "Thread-N" where N is a small decimal number.
             daemon (bool, optional): description below. Defaults to False.
-
+            verbose (bool, optional): If True thread loged. Defaults to True.
         """
+        if name is None:
+            name = f"MedianFilter-{MedianFilter.COUNTER}"
+        MedianFilter.COUNTER += 1
         super().__init__(
             queue_in,
             queue_out,
@@ -89,4 +95,5 @@ class MedianFilter(Broker):
             ),
             name=name,
             daemon=daemon,
+            verbose=verbose,
         )

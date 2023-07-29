@@ -89,6 +89,8 @@ class PictureRecorder(Consumer):
         consumer1.join()
     """
 
+    COUNTER = 0
+
     def __init__(
         self,
         queue: Queue,
@@ -99,6 +101,7 @@ class PictureRecorder(Consumer):
         previous_recorder=None,
         name=None,
         daemon=None,
+        verbose: bool = True,
     ) -> None:
         """
         Args:
@@ -109,10 +112,20 @@ class PictureRecorder(Consumer):
             previous_recorder (PictureRecorder, optional): Prievious PictureRecorder.
                 this case let save pictures on some threads and save order. Defaults to None.
             daemon (bool, optional): description below. Defaults to False.
+            verbose (bool, optional): If True thread loged. Defaults to True.
         """
         if previous_recorder is None:
             self._rec = _Recorder(folder_name, file_name, file_ext=file_ext)
         else:
             self._rec = previous_recorder._rec
+        if name is None:
+            name = f"PictureRecorder-{PictureRecorder.COUNTER}"
+        PictureRecorder.COUNTER += 1
 
-        super().__init__(queue, self._rec.save_to_file, name=name, daemon=daemon)
+        super().__init__(
+            queue,
+            self._rec.save_to_file,
+            name=name,
+            daemon=daemon,
+            verbose=verbose,
+        )

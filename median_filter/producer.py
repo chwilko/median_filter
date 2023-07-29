@@ -8,6 +8,7 @@ from time import sleep
 from typing import Any, Callable, Tuple
 
 from .common import StopValue
+from .logger import log
 
 
 class Producer(Thread):
@@ -33,6 +34,8 @@ class Producer(Thread):
 
     """
 
+    COUNTER = 0
+
     def __init__(
         self,
         queue: Queue,
@@ -41,6 +44,7 @@ class Producer(Thread):
         *,
         name: str = None,
         daemon: bool = None,
+        verbose: bool = True,
     ) -> None:
         """Initialize self.
 
@@ -53,11 +57,18 @@ class Producer(Thread):
             name (str, optional): the thread name. By default, a unique name is constructed of
                 the form "Thread-N" where N is a small decimal number.
             daemon (bool, optional): description below. Defaults to None.
+            verbose (bool, optional): If True thread loged. Defaults to True.
         """
+        if name is None:
+            name = f"Producer-{Producer.COUNTER}"
+        Producer.COUNTER += 1
+
         super().__init__(name=name, daemon=daemon)
         self.queue = queue
         self.interval = interval
         self.fun = fun
+        self.verbose = verbose
+        self.log("created")
 
     def run(self):
         """Method representing the thread's activity."""
@@ -66,5 +77,14 @@ class Producer(Thread):
             if not processing:
                 break
             self.queue.put(data)
+            self.log("Produced data.")
             sleep(self.interval)
         self.queue.put(StopValue())
+
+    def __del__(self):
+        self.log("closed")
+
+    def log(self, message: str) -> None:
+        if self.verbose:
+            log(message)
+

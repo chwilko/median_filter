@@ -14,6 +14,7 @@ from multiprocessing import Queue
 from .broker import Broker
 from .common import StopValue, set_n_steps
 from .consumer import Consumer
+from .logger import log
 from .median_filter import MedianFilter
 from .producer import Producer
 from .recorder import PictureRecorder
@@ -27,4 +28,5 @@ __all__ = [
     "set_n_steps",
     "MedianFilter",
     "PictureRecorder",
+    "log",
 ]

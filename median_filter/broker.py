@@ -7,6 +7,7 @@ from threading import Thread
 from typing import Any, Callable
 
 from .common import StopValue
+from .logger import log
 
 
 class Broker(Thread):
@@ -29,8 +30,9 @@ class Broker(Thread):
         producer.join()
         broker.join()
         consumer.join()
-
     """
+
+    COUNTER = 0
 
     def __init__(
         self,
@@ -40,6 +42,7 @@ class Broker(Thread):
         *,
         name: str = None,
         daemon: bool = None,
+        verbose: bool = True,
     ) -> None:
         """Initialize self.
 
@@ -51,11 +54,22 @@ class Broker(Thread):
             name (str, optional): the thread name. By default, a unique name is constructed of
                 the form "Thread-N" where N is a small decimal number.
             daemon (bool, optional): description below. Defaults to None.
+            verbose (bool, optional): If True thread loged. Defaults to True.
         """
-        super().__init__(name=name, daemon=daemon)
+
+        if name is None:
+            name = f"Broker-{Broker.COUNTER}"
+        Broker.COUNTER += 1
+
+        super().__init__(
+            name=name,
+            daemon=daemon,
+        )
         self.queue_in = queue_in
         self.queue_out = queue_out
         self.fun = fun
+        self.verbose = verbose
+        self.log("created")
 
     def run(
         self,
@@ -69,4 +83,13 @@ class Broker(Thread):
                 self.queue_in.put(StopValue())
                 self.queue_out.put(StopValue())
                 break
+            self.log("Processing has started.")
             self.queue_out.put(self.fun(data))
+            self.log("Processing completed.")
+
+    def __del__(self):
+        self.log("closed")
+
+    def log(self, message: str) -> None:
+        if self.verbose:
+            log(message)
