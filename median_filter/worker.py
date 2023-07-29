@@ -10,16 +10,6 @@ logging.basicConfig(
 )
 
 
-def log(message: str):
-    """Send log to console.
-    Send log to console if self.verbose
-
-    Args:
-        message (str): log message
-    """
-    logging.info(message)
-
-
 class Worker(Thread):
     """
     Abstract class for producer, broker and consumer.

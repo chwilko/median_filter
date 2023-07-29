@@ -17,7 +17,7 @@ from .consumer import Consumer
 from .median_filter import MedianFilter
 from .producer import Producer
 from .recorder import PictureRecorder
-from .worker import Worker, log
+from .worker import Worker
 
 __all__ = [
     "Broker",
@@ -27,6 +27,5 @@ __all__ = [
     "PictureRecorder",
     "Producer",
     "Worker",
-    "log",
     "set_n_steps",
 ]
