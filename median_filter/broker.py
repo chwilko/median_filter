@@ -82,7 +82,9 @@ class Broker(Worker):
                 return
             self.log("Processing has started.")
             try:
-                self.queue_out.put(self.fun(data))
+                out_val = self.fun(data)
+                self.queue_out.put(out_val)
             except Exception as error:  # pylint: disable = broad-exception-caught
                 self.warning(str(error))
+                continue
             self.log("Processing completed.")
