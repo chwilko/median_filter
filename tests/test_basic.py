@@ -1,23 +1,32 @@
+"""
+Tests on modules producer, broker and consumer
+which realizing extended consumer-producer paradigm.
+"""
 import random
+from typing import Any, Callable, Iterable
 
 import pytest
 
-from median_filter import Queue, StopValue, set_n_steps
-from median_filter.basic import Broker, Consumer, Producer
+from median_filter import Broker, Consumer, Producer, Queue, StopValue, set_n_steps
 
 
 @pytest.mark.parametrize(
-    "n",
+    "n_steps",
     (
         2,
         100,
         30,
     ),
 )
-def test_porducer(n):
+def test_porducer(n_steps: int):
+    """Producer standard operation test.
+
+    Args:
+        n_steps (int): producer send n_steps data to queue.
+    """
     queue: Queue = Queue()
-    counter = set_n_steps(n)
-    fun = lambda: (next(counter), 1)
+    counter = set_n_steps(n_steps)
+    fun = lambda: (next(counter), 1)  # noqa
     prod = Producer(
         queue,
         fun,
@@ -26,7 +35,7 @@ def test_porducer(n):
     prod.start()
 
     prod.join()
-    for _ in range(n):
+    for _ in range(n_steps):
         assert queue.get() == fun()[1]
 
     last = queue.get()
@@ -44,7 +53,13 @@ def test_porducer(n):
         ),
     ),
 )
-def test_broker(fun, values):
+def test_broker(fun: Callable, values: Iterable[Any]):
+    """Broker standard operation test.
+
+    Args:
+        fun (Callable): function which transform values
+        values (Iterable[Any]): list of values in one type
+    """
     queue_in: Queue = Queue()
     queue_out: Queue = Queue()
     for val in values:
@@ -82,16 +97,21 @@ def test_broker(fun, values):
         ),
     ),
 )
-def test_consumer(fun, values):
+def test_consumer(fun: Callable, values: Iterable[Any]):
+    """Cnosumer standard operation test.
+
+    Args:
+        fun (Callable): function which transform values
+        values (Iterable[Any]): list of values in one type
+    """
     rets = []
-    fun1 = lambda x: rets.append(fun(x))
     queue: Queue = Queue()
     for val in values:
         queue.put(val)
     queue.put(StopValue())
     consumer = Consumer(
         queue=queue,
-        fun=fun1,
+        fun=lambda x: rets.append(fun(x)),
     )
 
     consumer.start()

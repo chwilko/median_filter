@@ -1,11 +1,15 @@
+"""
+Median filter is special broker which get picture from queue,
+applies median folter and push modified picture to next queue.
+"""
 from multiprocessing import Queue
 from typing import Tuple
 
 import numpy as np
-from skimage.filters import median
+from skimage.filters import median  # pylint: disable = no-name-in-module
 from skimage.transform import resize
 
-from .basic import Broker
+from .broker import Broker
 
 
 def _resize_median_filter(

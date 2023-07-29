@@ -1,10 +1,15 @@
+"""
+Recorder is special consumer which get picture from queue,
+and save it.
+"""
 import os
+from multiprocessing import Queue
 from threading import Lock
 
 import numpy as np
 from skimage.io import imsave
 
-from .basic import Consumer, Queue
+from .consumer import Consumer
 
 
 class _Recorder:
@@ -56,6 +61,8 @@ class _Recorder:
             frame (np.ndarray): frame representing the picture
         """
         name = self._new_name()
+        if frame.shape[-1] == 1:
+            frame = frame[:, :, 0]
         imsave(
             name,
             arr=(255 * frame).astype(np.dtype("uint8")),

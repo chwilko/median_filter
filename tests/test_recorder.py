@@ -1,3 +1,6 @@
+"""
+Tests on module recorder which is responsible for saving images.
+"""
 import os
 from shutil import rmtree
 
@@ -10,6 +13,7 @@ from median_filter.recorder import PictureRecorder, _Recorder
 
 
 def test_preparing_file():
+    """Test valid create output folder."""
     folder_name = os.sep.join(["tests", "try"])
     file_name = "test"
     if os.path.exists(folder_name):
@@ -29,6 +33,11 @@ def test_preparing_file():
 
 @pytest.mark.parametrize("dim", (1, 3, 4))
 def test_use_next_names(dim: int):
+    """Test of setting the correct names of subsequent saved files.
+
+    Args:
+        dim (int): number of picture channels.
+    """
     folder_name = os.sep.join(["tests", "try"])
     file_name = "test"
     if os.path.exists(folder_name):
@@ -48,6 +57,11 @@ def test_use_next_names(dim: int):
 
 @pytest.mark.parametrize("dim", (1, 3, 4))
 def test_save_pictures(dim: int):
+    """Test of proper image storage.
+
+    Args:
+        dim (int): number of picture channels.
+    """
     folder_name = os.sep.join(["tests", "try"])
     file_name = "test"
     if os.path.exists(folder_name):
@@ -69,62 +83,45 @@ def test_save_pictures(dim: int):
         assert (saved_pic == expected_pic).all()
 
 
-def test_save_pictures_thread():
+@pytest.mark.parametrize("n_recorders", (1, 2, 6))
+def test_save_pictures_n_recorders(n_recorders: int):
+    """
+    PictureRecorder standard operation test on n threads.
+    """
     folder_name = os.sep.join(["tests", "try"])
     file_name = "test"
     if os.path.exists(folder_name):
         rmtree(folder_name)
 
+    # queue preparing
     queue: Queue = Queue()
-    pics = [np.random.random((10, 10, 3)) for _ in range(5)]
-
+    pics = [np.random.random((10, 10, 3)) for _ in range(300)]
     for pic in pics:
         queue.put(pic)
     queue.put(StopValue())
-    recorder = PictureRecorder(
-        queue,
-        folder_name,
-        file_name,
-    )
+    # recorders preparing
 
-    recorder.start()
-    recorder.join()
+    recorders = [
+        PictureRecorder(
+            queue,
+            folder_name,
+            file_name,
+        )
+    ]
+    for _ in range(n_recorders):
+        recorders.append(
+            PictureRecorder(
+                queue,
+                folder_name,
+                file_name,
+                previous_recorder=recorders[-1],
+            )
+        )
 
-    for i, pic in enumerate(pics):
-        saved_pic = imread(os.sep.join([folder_name, f"{file_name}_{i}.png"]))
-        expected_pic = (255 * pic).astype(np.dtype("uint8"))
-        assert (saved_pic == expected_pic).all()
-
-
-def test_save_pictures_two_recorders():
-    folder_name = os.sep.join(["tests", "try"])
-    file_name = "test"
-    if os.path.exists(folder_name):
-        rmtree(folder_name)
-
-    queue: Queue = Queue()
-    pics = [np.random.random((10, 10, 3)) for _ in range(100)]
-
-    for pic in pics:
-        queue.put(pic)
-    queue.put(StopValue())
-    recorder = PictureRecorder(
-        queue,
-        folder_name,
-        file_name,
-    )
-    recorder1 = PictureRecorder(
-        queue,
-        folder_name,
-        file_name,
-        previous_recorder=recorder,
-    )
-
-    recorder.start()
-    recorder1.start()
-
-    recorder.join()
-    recorder1.join()
+    for recorder in recorders:
+        recorder.start()
+    for recorder in recorders:
+        recorder.join()
 
     for i, pic in enumerate(pics):
         saved_pic = imread(os.sep.join([folder_name, f"{file_name}_{i}.png"]))

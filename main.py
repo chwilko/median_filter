@@ -17,7 +17,7 @@ class Source:
 
 
 def main():
-    input_shape = (1024, 768, 3)
+    input_shape = (768, 1024, 3)
     new_frame_shape = (512, 384)
     filter_shape = (5, 5, 1)
     interval = 50 / 1000
