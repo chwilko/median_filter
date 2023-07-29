@@ -79,10 +79,14 @@ you will see more in the file `main.py`
 
 ## Package
 * median_filter
-  * basic
+  * producer
     * Producer
+  * broker
     * Broker
+  * consumer
     * Consumer
+  * worker
+    * Worker
   * median_filter
     * MedianFilter
   * recorder 
