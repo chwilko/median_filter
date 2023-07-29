@@ -12,7 +12,7 @@ nad a special case of Consumer (Recorder).
 from multiprocessing import Queue
 
 from .broker import Broker
-from .common import StopValue, set_n_steps
+from .common import set_n_steps
 from .consumer import Consumer
 from .logger import log
 from .median_filter import MedianFilter
@@ -24,7 +24,6 @@ __all__ = [
     "Consumer",
     "Broker",
     "Producer",
-    "StopValue",
     "set_n_steps",
     "MedianFilter",
     "PictureRecorder",

@@ -17,6 +17,7 @@ class Source:
 
 
 def main():
+    timeout = 2
     input_shape = (768, 1024, 3)
     new_frame_shape = (512, 384)
     filter_shape = (5, 5, 1)
@@ -31,14 +32,25 @@ def main():
 
     src = Source(input_shape)
 
-    producer = Producer(queue0, lambda: (next(counter), src.get_data()), interval)
+    producer = Producer(
+        queue0,
+        lambda: (next(counter), src.get_data()),
+        interval,
+    )
     broker = MedianFilter(
         queue_in=queue0,
         queue_out=queue1,
         new_frame_shape=new_frame_shape,
         filter_shape=filter_shape,
+        timeout=timeout,
     )
-    consumer = PictureRecorder(queue1, folder_name, file_name, file_ext="png")
+    consumer = PictureRecorder(
+        queue1,
+        folder_name,
+        file_name,
+        file_ext="png",
+        timeout=timeout,
+    )
 
     producer.start()
     consumer.start()

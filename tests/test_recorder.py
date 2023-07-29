@@ -8,8 +8,10 @@ import numpy as np
 import pytest
 from skimage.io import imread
 
-from median_filter import Queue, StopValue
+from median_filter import Queue
 from median_filter.recorder import PictureRecorder, _Recorder
+
+TIMEOUT = 0.1
 
 
 def test_preparing_file():
@@ -98,7 +100,6 @@ def test_save_pictures_n_recorders(n_recorders: int):
     pics = [np.random.random((10, 10, 3)) for _ in range(300)]
     for pic in pics:
         queue.put(pic)
-    queue.put(StopValue())
     # recorders preparing
 
     recorders = [
@@ -106,6 +107,7 @@ def test_save_pictures_n_recorders(n_recorders: int):
             queue,
             folder_name,
             file_name,
+            timeout=TIMEOUT,
         )
     ]
     for _ in range(n_recorders):
@@ -115,6 +117,7 @@ def test_save_pictures_n_recorders(n_recorders: int):
                 folder_name,
                 file_name,
                 previous_recorder=recorders[-1],
+                timeout=TIMEOUT,
             )
         )
 

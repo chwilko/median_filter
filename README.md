@@ -88,6 +88,5 @@ you will see more in the file `main.py`
   * recorder 
     * Recorder
   * common
-    * StopValue
     * set_n_steps
 

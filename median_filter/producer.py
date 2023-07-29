@@ -3,15 +3,14 @@ Producer is worker on single thread which takes data from one queue, and consume
 According to the Producer-Consumer Paradigm.
 """
 from multiprocessing import Queue
-from threading import Thread
+from queue import Empty
 from time import sleep
 from typing import Any, Callable, Tuple
 
-from .common import StopValue
-from .logger import log
+from .worker import Worker
 
 
-class Producer(Thread):
+class Producer(Worker):
     """
     Takes data and puts it into queue as a distinct thread.
 
@@ -50,7 +49,6 @@ class Producer(Thread):
 
         Args:
             queue (multiprocessing.Queue): queue for converted data.
-                Will be ended by median_filter.StopValue.
             fun (Callable[[], Tuple[bool, Any]]): function to produce data.
                 Data are producing while fun return (True, ...).
             interval (float, optional): interval to next function calling. Defaults to 0.
@@ -63,28 +61,20 @@ class Producer(Thread):
             name = f"Producer-{Producer.COUNTER}"
         Producer.COUNTER += 1
 
-        super().__init__(name=name, daemon=daemon)
+        super().__init__(name=name, daemon=daemon, verbose=verbose)
         self.queue = queue
         self.interval = interval
         self.fun = fun
-        self.verbose = verbose
-        self.log("created")
 
     def run(self):
         """Method representing the thread's activity."""
-        while 1:
-            processing, data = self.fun()
-            if not processing:
-                break
-            self.queue.put(data)
-            self.log("Produced data.")
-            sleep(self.interval)
-        self.queue.put(StopValue())
-
-    def __del__(self):
-        self.log("closed")
-
-    def log(self, message: str) -> None:
-        if self.verbose:
-            log(message)
-
+        try:
+            while 1:
+                processing, data = self.fun()
+                if not processing:
+                    break
+                self.queue.put(data)
+                self.log("Produced data.")
+                sleep(self.interval)
+        except Empty:
+            return

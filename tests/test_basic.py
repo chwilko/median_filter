@@ -7,7 +7,9 @@ from typing import Any, Callable, Iterable
 
 import pytest
 
-from median_filter import Broker, Consumer, Producer, Queue, StopValue, set_n_steps
+from median_filter import Broker, Consumer, Producer, Queue, set_n_steps
+
+TIMEOUT = 0.1
 
 
 @pytest.mark.parametrize(
@@ -38,8 +40,6 @@ def test_porducer(n_steps: int):
     for _ in range(n_steps):
         assert queue.get() == fun()[1]
 
-    last = queue.get()
-    assert isinstance(last, StopValue)
     assert queue.empty()
 
 
@@ -64,11 +64,11 @@ def test_broker(fun: Callable, values: Iterable[Any]):
     queue_out: Queue = Queue()
     for val in values:
         queue_in.put(val)
-    queue_in.put(StopValue())
     broker = Broker(
         queue_in=queue_in,
         queue_out=queue_out,
         fun=fun,
+        timeout=TIMEOUT,
     )
     broker.start()
 
@@ -78,12 +78,8 @@ def test_broker(fun: Callable, values: Iterable[Any]):
         val_out = queue_out.get()
         assert val_out == fun(val_in)
 
-    last = queue_out.get()
-    assert isinstance(last, StopValue)
     assert queue_out.empty()
 
-    last2 = queue_in.get()
-    assert isinstance(last2, StopValue)
     assert queue_in.empty()
 
 
@@ -108,10 +104,11 @@ def test_consumer(fun: Callable, values: Iterable[Any]):
     queue: Queue = Queue()
     for val in values:
         queue.put(val)
-    queue.put(StopValue())
+
     consumer = Consumer(
         queue=queue,
         fun=lambda x: rets.append(fun(x)),
+        timeout=TIMEOUT,
     )
 
     consumer.start()
@@ -121,6 +118,4 @@ def test_consumer(fun: Callable, values: Iterable[Any]):
     for i, val_in in enumerate(values):
         assert rets[i] == fun(val_in)
 
-    last = queue.get()
-    assert isinstance(last, StopValue)
     assert queue.empty()

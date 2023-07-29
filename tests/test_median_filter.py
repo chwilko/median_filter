@@ -6,7 +6,7 @@ from typing import Tuple
 import numpy as np
 import pytest
 
-from median_filter import Queue, StopValue
+from median_filter import Queue
 from median_filter.median_filter import MedianFilter, _resize_median_filter
 
 median_check_params = (
@@ -15,6 +15,7 @@ median_check_params = (
     ((3, 7), (2**8, 2**8)),
     ((9, 1), (2**7, 2**6)),
 )
+TIMEOUT = 0.1
 
 
 def median(values: np.ndarray) -> float:
@@ -130,13 +131,13 @@ def test_MedianFilter(  # pylint: disable=invalid-name
 
     for pic in pics:
         queue_in.put(pic)
-    queue_in.put(StopValue())
 
     working_thread = MedianFilter(
         queue_in,
         queue_out,
         pic_shape,
         (*median_shape, 1),
+        timeout=TIMEOUT,
     )
 
     working_thread.start()
@@ -146,5 +147,3 @@ def test_MedianFilter(  # pylint: disable=invalid-name
     for pic in pics:
         new_pic = queue_out.get()
         assert random_median_check(pic, new_pic, median_shape, pic_shape)
-
-    assert isinstance(queue_out.get(), StopValue)

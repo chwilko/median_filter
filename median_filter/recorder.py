@@ -102,10 +102,11 @@ class PictureRecorder(Consumer):
         name=None,
         daemon=None,
         verbose: bool = True,
+        timeout: float = 10.0,
     ) -> None:
         """
         Args:
-            queue (Queue): queue with picture data ended by StopValue
+            queue (Queue): queue with picture data.
             folder_name (str): folder to save pictures
             file_name (str): name pattern to save pictures.
             file_ext (str, optional): Extension for file to record. Defaults to "png".
@@ -113,6 +114,7 @@ class PictureRecorder(Consumer):
                 this case let save pictures on some threads and save order. Defaults to None.
             daemon (bool, optional): description below. Defaults to False.
             verbose (bool, optional): If True thread loged. Defaults to True.
+            timeout (float, optional): Timeout for queue get. Defaults to 5.0.
         """
         if previous_recorder is None:
             self._rec = _Recorder(folder_name, file_name, file_ext=file_ext)
@@ -128,4 +130,5 @@ class PictureRecorder(Consumer):
             name=name,
             daemon=daemon,
             verbose=verbose,
+            timeout=timeout,
         )

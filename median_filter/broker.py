@@ -3,14 +3,13 @@ Broker is worker on single thread which takes data from one queue,
 converts it, and puts it into another as distinct thread.
 """
 from multiprocessing import Queue
-from threading import Thread
+from queue import Empty
 from typing import Any, Callable
 
-from .common import StopValue
-from .logger import log
+from .worker import Worker
 
 
-class Broker(Thread):
+class Broker(Worker):
     """
     Takes data from one queue, converts it,
         and puts it into another as distinct thread.
@@ -43,18 +42,19 @@ class Broker(Thread):
         name: str = None,
         daemon: bool = None,
         verbose: bool = True,
+        timeout: float = 10.0,
     ) -> None:
         """Initialize self.
 
         Args:
             queue_in (multiprocessing.Queue): queue with data to convert.
-                Must be ended by median_filter.StopValue.
             queue_out (multiprocessing.Queue): queue for converted data.
             fun (Callable[[Any], Any]): function for data processing
             name (str, optional): the thread name. By default, a unique name is constructed of
                 the form "Thread-N" where N is a small decimal number.
             daemon (bool, optional): description below. Defaults to None.
             verbose (bool, optional): If True thread loged. Defaults to True.
+            timeout (float, optional): Timeout for queue get. Defaults to 5.0.
         """
 
         if name is None:
@@ -64,32 +64,22 @@ class Broker(Thread):
         super().__init__(
             name=name,
             daemon=daemon,
+            verbose=verbose,
         )
         self.queue_in = queue_in
         self.queue_out = queue_out
         self.fun = fun
-        self.verbose = verbose
-        self.log("created")
+        self.timeout = timeout
 
     def run(
         self,
     ):
         """Method representing the thread's activity."""
-        while 1:
-            if self.queue_in.empty():
-                continue
-            data = self.queue_in.get()
-            if isinstance(data, StopValue):
-                self.queue_in.put(StopValue())
-                self.queue_out.put(StopValue())
-                break
-            self.log("Processing has started.")
-            self.queue_out.put(self.fun(data))
-            self.log("Processing completed.")
-
-    def __del__(self):
-        self.log("closed")
-
-    def log(self, message: str) -> None:
-        if self.verbose:
-            log(message)
+        try:
+            while 1:
+                data = self.queue_in.get(timeout=self.timeout)
+                self.log("Processing has started.")
+                self.queue_out.put(self.fun(data))
+                self.log("Processing completed.")
+        except Empty:
+            return

@@ -68,19 +68,21 @@ class MedianFilter(Broker):
         name: str = None,
         daemon: bool = None,
         verbose: bool = True,
+        timeout: float = 10.0,
     ) -> None:
         """Initialize self.
 
         Args:
-            queue_in (multiprocessing.Queue): queue with array to convert, ended by StopValue.
+            queue_in (multiprocessing.Queue): queue with array to convert.
                 Array have to has dimension (m x n x k), where k can be 1,3,4.
-            queue_out (multiprocessing.Queue): queue for converted data. Will be ended by StopValue
+            queue_out (multiprocessing.Queue): queue for converted data.
             new_frame_shape (Tuple[int, int]): final shape to reshape data from queue_in
             filter_shape (Tuple[int, int, int]): shape of the filter to be used by median filter
             name (str, optional): the thread name. By default, a unique name is constructed of
                 the form "Thread-N" where N is a small decimal number.
             daemon (bool, optional): description below. Defaults to False.
             verbose (bool, optional): If True thread loged. Defaults to True.
+            timeout (float, optional): Timeout for queue get. Defaults to 5.0.
         """
         if name is None:
             name = f"MedianFilter-{MedianFilter.COUNTER}"
@@ -96,4 +98,5 @@ class MedianFilter(Broker):
             name=name,
             daemon=daemon,
             verbose=verbose,
+            timeout=timeout,
         )

@@ -1,3 +1,6 @@
+"""
+Modulus responsible for sending logs to the console.
+"""
 import logging
 
 logging.basicConfig(
@@ -7,4 +10,10 @@ logging.basicConfig(
 
 
 def log(message: str):
+    """Send log to console.
+    Send log to console if self.verbose
+
+    Args:
+        message (str): log message
+    """
     logging.info(message)
