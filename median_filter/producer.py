@@ -3,7 +3,6 @@ Producer is worker on single thread which takes data from one queue, and consume
 According to the Producer-Consumer Paradigm.
 """
 from multiprocessing import Queue
-from queue import Empty
 from time import sleep
 from typing import Any, Callable, Tuple
 
@@ -68,13 +67,14 @@ class Producer(Worker):
 
     def run(self):
         """Method representing the thread's activity."""
-        try:
-            while 1:
+        while 1:
+            try:
                 processing, data = self.fun()
-                if not processing:
-                    break
-                self.queue.put(data)
-                self.log("Produced data.")
-                sleep(self.interval)
-        except Empty:
-            return
+            except Exception as error:  # pylint: disable = broad-exception-caught
+                self.warning(str(error))
+                continue
+            if not processing:
+                break
+            self.queue.put(data)
+            self.log("Produced data.")
+            sleep(self.interval)

@@ -42,6 +42,24 @@ def test_porducer(n_steps: int):
 
     assert queue.empty()
 
+# def test_porducer_error_in_producing():
+#     """Producer catching errors.
+#     """
+#     n_steps= 100
+#     queue: Queue = Queue()
+#     counter = set_n_steps(n_steps)
+#     fun = lambda: (next(counter), 1 / random.randint(-1, 1))  # noqa
+#     prod = Producer(
+#         queue,
+#         fun,
+#         interval=0,
+#     )
+#     prod.start()
+
+#     prod.join()
+#     # probability for raise assert error in working code is (1/3)**100. IMO acceptable.
+#     assert not queue.empty()
+
 
 @pytest.mark.parametrize(
     "fun, values",

@@ -14,18 +14,19 @@ from multiprocessing import Queue
 from .broker import Broker
 from .common import set_n_steps
 from .consumer import Consumer
-from .logger import log
 from .median_filter import MedianFilter
 from .producer import Producer
 from .recorder import PictureRecorder
+from .worker import Worker, log
 
 __all__ = [
-    "Queue",
-    "Consumer",
     "Broker",
-    "Producer",
-    "set_n_steps",
+    "Consumer",
+    "Queue",
     "MedianFilter",
     "PictureRecorder",
+    "Producer",
+    "Worker",
     "log",
+    "set_n_steps",
 ]

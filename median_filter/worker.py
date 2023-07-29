@@ -1,9 +1,23 @@
 """
 Worker is abstract class for producer, broker and consumer.
 """
+import logging
 from threading import Thread
 
-from .logger import log
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] [%(threadName)s] [%(levelname)s]: %(message)s",
+)
+
+
+def log(message: str):
+    """Send log to console.
+    Send log to console if self.verbose
+
+    Args:
+        message (str): log message
+    """
+    logging.info(message)
 
 
 class Worker(Thread):
@@ -45,11 +59,21 @@ class Worker(Thread):
         self.log("closed")
 
     def log(self, message: str) -> None:
-        """Send log to console.
+        """Send info log to console.
         Send log to console if self.verbose
 
         Args:
             message (str): log message
         """
         if self.verbose:
-            log(message)
+            logging.info(message)
+
+    def warning(self, message: str) -> None:
+        """Send warning log to console.
+        Send log to console if self.verbose
+
+        Args:
+            message (str): log message
+        """
+        if self.verbose:
+            logging.error(message)

@@ -64,11 +64,14 @@ class Consumer(Worker):
 
     def run(self):
         """Method representing the thread's activity."""
-        try:
-            while 1:
+        while 1:
+            try:
                 data = self.queue.get(timeout=self.timeout)
+            except Empty:
+                return
+            try:
                 self.fun(data)
+            except Exception as error:  # pylint: disable = broad-exception-caught
+                self.warning(str(error))
 
-                self.log("Consumed.")
-        except Empty:
-            pass
+            self.log("Consumed.")

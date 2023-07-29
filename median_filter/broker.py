@@ -75,11 +75,14 @@ class Broker(Worker):
         self,
     ):
         """Method representing the thread's activity."""
-        try:
-            while 1:
+        while 1:
+            try:
                 data = self.queue_in.get(timeout=self.timeout)
-                self.log("Processing has started.")
+            except Empty:
+                return
+            self.log("Processing has started.")
+            try:
                 self.queue_out.put(self.fun(data))
-                self.log("Processing completed.")
-        except Empty:
-            return
+            except Exception as error:  # pylint: disable = broad-exception-caught
+                self.warning(str(error))
+            self.log("Processing completed.")
