@@ -1,7 +1,11 @@
 # median_filter
+
 ## Author
 Bartłomiej Chwiłkowski (chwilko)
 [github](https://github.com/chwilko/median_filter)
+
+## license
+MIT license
 
 ## Table of contents
 - [median\_filter](#median_filter)
